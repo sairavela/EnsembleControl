@@ -57,7 +57,7 @@ while(1)
     %round = round + 1;
     
     %creating ensemble of controllers
-    tic 
+    %tic 
     %tstart = tic;
     u_ens = repmat(y_forced, 1, num_ens)+mv*randn(2, num_ens); 
     for index = (1:num_ens)
@@ -120,8 +120,7 @@ while(1)
     y2 = y1-l_2*cos(theta2);
         pts = [0 0; x1 y1; x2 y2;];
         
-    
-    
+
     
 %     %track
 %     hold on
