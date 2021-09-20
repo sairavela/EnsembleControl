@@ -107,7 +107,7 @@ while(1)
     drawnow;
     
       x0 = [mean_state; mean_control; params];
-    [t,x] = ode45(@doubleP,[0 0.01],x0);
+    [t,x] = ode45(@doubleP,[0 0.01/4],x0);
     x(:,1:2) = atan2(sin(x(:,1:2)),cos(x(:,1:2)));
             
     mean_state = x(end,1:4)';

@@ -54,7 +54,7 @@ while(1)
         mv = 1;
         % 'x' control input
     end
-    %round = round + 1;
+    round = round + 1;
     
     %creating ensemble of controllers
     %tic 
@@ -118,7 +118,7 @@ while(1)
     y1 = -l_1*cos(theta1); %y-coordinates for first pendulum
     x2 = x1+l_2*sin(theta2);
     y2 = y1-l_2*cos(theta2);
-        pts = [0 0; x1 y1; x2 y2;];
+    pts = [0 0; x1(end) y1(end); x2(end) y2(end)];
         
 
     
@@ -127,26 +127,14 @@ while(1)
 %     plot(pos_ens(1,1),pos_ens(2,1), 'go')
 %     plot(pos_ens(1,2),pos_ens(2,2), 'ro')
 %     hold off
-    
-    
-    for pt = 1:num_points
-        delete(p1);
-        delete(p2);
-        
-        hold on; 
-        plot(0, 0, 'bx');
-        axis([-axis_l axis_l -axis_l axis_l])
-        plot(x_g, y_g, 'rx');
-        hold off
-        x_1 = [0 x1(pt)];
-        y_1 = [0 y1(pt)];
-        x_2 = [x1(pt) x2(pt)];
-        y_2 = [y1(pt) y2(pt)];
-        p1 = line(x_1, y_1);
-        p2 = line(x_2, y_2);
-        drawnow
-    end
-    
+    hold on; 
+    plot(0,0,'x');
+    axis([-1 1 -1 1]);
+    plot(x_g, y_g, 'rx');
+    hold off
+    line(pts(:,1), pts(:,2));
+    drawnow
+     
     y0 = y(end, :);
     x2_f = l_1*sin(y0(1))+l_2*sin(y0(2));
     y2_f = -l_1*cos(y0(1))-l_2*cos(y0(2));
