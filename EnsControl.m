@@ -28,6 +28,8 @@ classdef EnsControl
         function state_ens = Forecast(obj, xin, nens, state_ens, control_ens)
         % Prediction of state from t=0 to horizon (t+horizon)
             ic = [repmat(xin, [1, nens]); control_ens];
+
+            % Change dynamics for different systems
             for i = 1:nens
                 x0 = [ic(:,i); obj.params];
                 [~,x] = ode45(@obj.state_fnc,[0 obj.horizon],x0);
