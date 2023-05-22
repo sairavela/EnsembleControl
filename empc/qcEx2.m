@@ -1,0 +1,70 @@
+clear all;
+close all;
+
+gr =0;
+%IC
+x = [0;0;0;0;0;0;0;0;0;0;0;0];
+xg = [0 1 1 0;0 0 1 1;1 1 1 1;...
+      0 0 0 0;0 0 0 0;0 0 0 0;...
+      0 0 0 0;0 0 0 0;0 0 0 0;...
+      0 0 0 0;0 0 0 0;0 0 0 0];
+Ts = 0.25;
+p = 18;
+m = 2;
+gprec = [0.015; 0.015; 0.001;...
+         0.001; 0.001; 0.001;...
+         0.001; 0.001; 0.001;...
+         0.001; 0.001; 0.001];
+     gprec = diag(gprec.^2);
+nens = 100;
+Duration = 100;
+
+xHistory = x';
+uk = [4.9; 4.9; 4.9; 4.9;];
+nloptions = nlmpcmoveopt;
+nloptions.MVTarget = [4.9 4.9 4.9 4.9]; 
+uHistory(1,:) = uk';
+uens = [];
+stepTs = Ts/2;
+horT = 4*Ts;
+if (gr)
+    hbar = waitbar(0,'Simulation Progress');
+end
+gsel = 1;
+for k = 1:(Duration/stepTs)
+    disp(k*stepTs);
+    % Set references for previewing
+    % Compute the control moves with reference previewing.
+    xk = xHistory(k,:)';    uHistory(k+1,:) = uk';
+    if (GoalSat(xk,xg(:,gsel)))
+        gsel = rem(gsel,4)+1;
+    end
+    % Ensemble Model Predictive Controller
+     [uens,xens] = EnsSim(xk,uk,uens,nens,horT);
+     [uensplus] = EnsUpdate(xens,uens,xg(:,gsel),gprec);
+     HistU(k,:) = sum(var(uensplus,[],2));
+     uk = median(uensplus,2);
+ 
+     if(gr)
+         plot3(xens(1,:)', xens(2,:)',xens(3,:)','.');
+     hold on;
+     plot3(xHistory(:,1),xHistory(:,2),xHistory(:,3),'kx');
+     plot3(xg(1),xg(2),xg(3),'b+');
+     hold off; axis([-10 10 -10 10 -3 2]);
+     drawnow;
+     end
+     
+    % Update states.
+    ODEFUN = @(t,xk) QuadrotorStateFcn(xk,uk);
+    [TOUT,YOUT] = ode45(ODEFUN,[0 stepTs], xHistory(k,:)');
+    xHistory(k+1,:) = YOUT(end,:);
+ if (gr)
+     waitbar(k*Ts/Duration,hbar);
+ end
+    
+end
+if (gr)
+    close(hbar);
+end
+plotQuadrotorTrajectory;
+%animateQuadrotorTrajectory

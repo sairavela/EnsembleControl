@@ -1,0 +1,16 @@
+function [xout,uout] = EnsUpdate(xens,uens,xg,gprec)
+
+dxg = xg - xens; dxg(isnan(dxg))=0;
+
+muens = mean(uens,2);
+duens = uens - muens;
+dxens = xens - mean(xens,2);
+[ux,sx,vx]= svd(dxens);
+
+sx = diag(diag(sx));
+mxx = max(diag(sx));
+cux = duens*dxens'/99;
+ uout = muens+cux*ux*pinv(sx.*sx + mxx/2*eye(12))*ux'*dxg;%uout  =muens+cux*icx*dxg;
+% sdxg = sum(abs(dxg(1:3,:)));
+% uout = uens(:,sdxg == min(sdxg));
+% xout = xens(:,sdxg == min(sdxg));

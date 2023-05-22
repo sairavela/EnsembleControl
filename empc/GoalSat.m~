@@ -1,0 +1,4 @@
+function satyes = GoalSat(x,y)
+
+if mean(abs(x-y))< 0.01 
+    ret
