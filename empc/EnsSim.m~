@@ -1,0 +1,29 @@
+function [uens,xens] = EnsSim(xk,uk,uens,nens,Ts)
+
+sigu = [0.1;0.0001; 0.0001; 0.0001];
+sigu = diag(sigu);
+
+
+     
+     
+          
+          
+if ~isempty(uens)
+    sigu = diag(std(uens')')/2;    
+end
+uk = uk(:);
+   pert= sigu*randn(4,100);
+upert = [pert(1,:)+pert(2,:)-pert(3,:)-pert(4,:);...
+              pert(1,:)+pert(2,:)+pert(3,:)+pert(4,:);...
+              pert(1,:)-pert(2,:)+pert(3,:)-pert(4,:);...
+              pert(1,:)-pert(2,:)-pert(3,:)+pert(4,:);];
+%vk = 4.9+0.; xv = -0.0; yv = 0.01; rv = 0.
+%    uk = [ vk+xv-rv-yv; vk+yv+xv+rv; vk+yv-xv-rv; vk-xv+rv-yv]
+  
+
+          uens = uk+upert;
+for ens = 1:nens
+     ODEFUN = @(t,xk) QuadrotorStateFcn(xk,uens(:,ens));
+    [~,YOUT] = ode45(ODEFUN,[0 4*Ts], xk);
+    xens(:,ens) = YOUT(end,:)';
+end
